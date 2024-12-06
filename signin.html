@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            color: #101010;
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background-color: #5a67d8;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+            transition: background 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: black;
+            box-shadow: 0 0 0 0.2rem rgba(90, 103, 216, 0.25);
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+
+        .form-control:focus {
+            border-color: #5a67d8;
+            box-shadow: 0 0 0 0.2rem rgba(90, 103, 216, 0.25);
+        }
+
+        h3 {
+            color: #0c0c0c;
+            font-weight: bold;
+        }
+
+        a {
+            color: #0f0f0f;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: #cbd5e0;
+            text-decoration: underline;
+        }
+
+        #verify {
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        .container {
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card p-4">
+        <h3 class="text-center mb-4">Sign In</h3>
+        <form>
+            <div class="form-group">
+                <label for="email" class="text-white">Email Address</label>
+                <input type="email" class="form-control" id="email" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="password" class="text-white">Password</label>
+                <input type="password" class="form-control" id="password" placeholder="Enter your password">
+            </div>
+            <button type="button" id="signIn" class="btn btn-primary">Sign In</button>
+            <p class="text-center mt-3"><a href="signup.html">No have an account signup</a></p>
+        </form>
+    </div>
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="firebase.js" type="module"></script>
+<script src="index.js" type="module"></script>
+</body>
+</html>

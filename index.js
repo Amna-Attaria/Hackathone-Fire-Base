@@ -1,17 +1,17 @@
 // Import Firebase methods
-import { 
-    auth, 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword, 
-    onAuthStateChanged, 
-    sendEmailVerification, 
-    signOut, 
-    signInWithPopup, 
+import {
+    auth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    sendEmailVerification,
+    signOut,
+    signInWithPopup,
     GoogleAuthProvider,
-    db,  
-    addDoc, 
-    collection,getDocs , doc, setDoc,updateDoc,serverTimestamp,
-     deleteDoc, query,  orderBy,  onSnapshot,Timestamp
+    db,
+    addDoc,
+    collection, getDocs, doc, setDoc, updateDoc, serverTimestamp,
+    deleteDoc, query, orderBy, onSnapshot, Timestamp, where
 } from "./firebase.js";
 
 // Initialize Google Auth Provider
@@ -49,25 +49,25 @@ let signUp = async () => {
         return;
     }
 
-//  -----------------set doc---------
-try {
-    // Sign up the user and get the user object
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+    //  -----------------set doc---------
+    try {
+        // Sign up the user and get the user object
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
 
-    const docRef = doc(db, "userdata", user.uid); // Now `user` is defined
-    await setDoc(docRef, {
-        ...userData,
-        uId: user.uid
-    });
+        const docRef = doc(db, "userdata", user.uid); // Now `user` is defined
+        await setDoc(docRef, {
+            ...userData,
+            uId: user.uid
+        });
 
-    console.log("Document written with ID:", docRef.id);
-    alert("Signup Successful");
-    window.location.href = "index.html"; 
-} catch (error) {
-    console.error("Error:", error.message);
-    alert("Error: " + error.message);
-}
+        console.log("Document written with ID:", docRef.id);
+        alert("Signup Successful");
+        window.location.href = "index.html";
+    } catch (error) {
+        console.error("Error:", error.message);
+        alert("Error: " + error.message);
+    }
 
 
 
@@ -104,35 +104,7 @@ if (signInButton) {
     signInButton.addEventListener("click", sign_In);
 }
 
-// Monitor authentication state changes
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        console.log("User is signed in:", user);
-    } else {
-        console.log("No user is signed in");
-    }
-});
 
-// Function to send email verification
-let sendMail = () => {
-    if (auth.currentUser) {
-        sendEmailVerification(auth.currentUser)
-            .then(() => {
-                alert("Email verification sent");
-            })
-            .catch((error) => {
-                console.error("Error sending verification email:", error.message);
-            });
-    } else {
-        alert("No user is currently signed in.");
-    }
-};
-
-// Add event listener to Email Verification button
-let verification = document.getElementById("verify");
-if (verification) {
-    verification.addEventListener("click", sendMail);
-}
 
 // Sign Out function
 let signout = () => {
@@ -172,11 +144,10 @@ const googleBtn = document.getElementById("google");
 if (googleBtn) {
     googleBtn.addEventListener("click", googleSignin);
 }
-let getData = async()=>
-{
+let getData = async () => {
     const querySnapshot = await getDocs(collection(db, "users"));
     querySnapshot.forEach((doc) => {
-      console.log(`${doc.id} => ${doc.data()}`);
+        console.log(`${doc.id} => ${doc.data()}`);
     });
 }
 getData()
@@ -184,165 +155,16 @@ const Update = document.getElementById("update");
 if (googleBtn) {
     Update.addEventListener("click", UpdateProfile);
 }
-let UpdateProfile = async () => {
-    let name = document.getElementById("name").value;
-    let phone = document.getElementById("phone").value;
-    let password = document.getElementById("password").value;
-
-    if (auth.currentUser) {
-        let id = auth.currentUser.uid;
-
-        try {
-            const washingtonRef = doc(db, "userdata", id);
-            await updateDoc(washingtonRef, { name,
-                 phone, 
-                 password,
-                 timestamp: serverTimestamp(),
-                }
-                );
-            alert("Updated");
-        } catch (e) {
-            console.error("Error updating document:", e);
-        }
-    } else {
-        alert("You must be signed in to update your profile.");
-    }
-};
-// Attach event listener for update button
-let update = document.getElementById("update");
-if (update) {
-    update.addEventListener("click", UpdateProfile); // Attach event listener once
-}
-
-let deleteAccount=async()=>
-{
-  let id = auth.currentUser.uid
-  console.log(id);
-  await deleteDoc(doc(db, "userdata", id));
-  alert("Delete Successfully")
-}
-
-let deleteButton = document.getElementById("delete");
-if (deleteButton) {
-    deleteButton.addEventListener("click", deleteAccount);
-}
-
-
-// POST APP 
-
-let addDocument = async () => {
-    try {
-      let title_input = document.getElementById("title");
-      let desc_input = document.getElementById("description");
-   
-      title_input.style.display = "block";
-      desc_input.style.display = "block";
-      // Adding document to Firestore
-      const docRef = await addDoc(collection(db, "Post"), {
-        title: title_input.value,
-        desc: desc_input.value,
-        time: Timestamp.now(),
-      });
-  
-      console.log("Successfully added document with ID: ", docRef.id);
-  
-      // Clear input fields
-      title_input.value = '';
-      desc_input.value = '';
-    } catch (error) {
-      console.log("Error adding document: ", error);
-    }
-  };
-  // Add event listener to button
-  let button = document.getElementById("button");
-  button.addEventListener("click", addDocument);
-  
-// Function to fetch and display posts based on category
-const fetchPosts = (category = null) => {
-    try {
-        let queryRef = query(collection(db, "Post"), orderBy("time", "desc"));
-
-        // If a category is selected, filter posts by category
-        if (category) {
-            queryRef = query(queryRef, where("category", "==", category));  // Add category filter
-        }
-
-        const unsubscribe = onSnapshot(queryRef, (querySnapshot) => {
-            let post_data = document.getElementById("post_data");
-            post_data.innerHTML = '';  // Clear previous posts
-
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                const timeString = data.time ? data.time.toDate().toLocaleString() : "No Timestamp";
-                const currentUser = auth.currentUser;
-                const userName = currentUser && currentUser.displayName;
-
-                // Create post elements dynamically
-                const postElement = document.createElement('div');
-                postElement.classList.add('p-2', 'mb-2');
-                postElement.setAttribute('data-id', doc.id);
-
-                postElement.innerHTML = `
-                    <div class="card-header d-flex">
-                        <div class="name-time d-flex flex-column">
-                            ${userName}
-                            <div class="time">${timeString}</div>
-                        </div>
-                    </div>
-                    <blockquote class="blockquote mb-0">
-                        <p class="title">${data.title}</p>
-                        <footer class="blockquote-footer description">${data.desc}</footer>
-                    </blockquote>
-                    <div class="card-footer d-flex justify-content-end">
-                        <button type="button" class="ms-2 btn bg-primary text-light editBtn">Edit</button>
-                        <button type="button" class="ms-2 btn btn-danger deleteBtn">Delete</button>
-                    </div>
-                `;
-
-                // Append the post element to the post_data container
-                post_data.appendChild(postElement);
-            });
-
-            // Attach event listeners for delete and edit buttons
-            attachEventListeners();
-        });
-
-        return unsubscribe;
-    } catch (error) {
-        console.error("Error fetching posts:", error);
-    }
-};
-
-// Call this function initially to display all posts
-fetchPosts();  // Display all posts initially
-
-// Function to handle category radio button selection
-const handleCategoryChange = () => {
-    const categoryRadios = document.querySelectorAll('input[name="category"]');
-    
-    categoryRadios.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            const selectedCategory = e.target.value;
-            // Fetch posts based on the selected category
-            fetchPosts(selectedCategory);  // Pass selected category to filter posts
-        });
-    });
-};
-
-// Initialize the category filter functionality
-handleCategoryChange();
 
 
 
-
-// Attach event listeners for delete and edit functionality
+// Attach event listeners for post actions (edit/delete)
 const attachEventListeners = () => {
     const post_data = document.getElementById("post_data");
 
-    // Delete functionality
     post_data.addEventListener("click", async (e) => {
         if (e.target && e.target.classList.contains("deleteBtn")) {
-            const postId = e.target.closest('.p-2').getAttribute('data-id');  // Ensure it gets the correct .p-2 (post card)
+            const postId = e.target.closest('.p-2').getAttribute('data-id');
             if (postId) {
                 try {
                     await deleteDoc(doc(db, "Post", postId)); // Delete from Firestore
@@ -357,19 +179,16 @@ const attachEventListeners = () => {
         }
     });
 
-    // Edit functionality
     post_data.addEventListener("click", (e) => {
         if (e.target && e.target.classList.contains("editBtn")) {
-            const postId = e.target.closest('.p-2').getAttribute('data-id'); // Ensure it gets the correct .p-2 (post card)
-            const cardElement = e.target.closest('.p-2'); // Get the closest .p-2 for proper reference
+            const postId = e.target.closest('.p-2').getAttribute('data-id');
+            const cardElement = e.target.closest('.p-2');
             const currentTitle = cardElement.querySelector('.title').innerText;
             const currentDesc = cardElement.querySelector('.description').innerText;
 
-            // Fill the edit form with current values
             document.getElementById("title").value = currentTitle;
             document.getElementById("description").value = currentDesc;
 
-            // Attach the update function to the update button
             let updateButton = document.getElementById("update_post");
             if (updateButton) {
                 updateButton.onclick = () => UpdatePost(postId, cardElement);
@@ -378,42 +197,240 @@ const attachEventListeners = () => {
     });
 };
 
-// Update the post in Firestore and UI
-let UpdatePost = async (postId, cardElement) => {
-    let title = document.getElementById("title").value;
-    let desc = document.getElementById("description").value;
+// // Fetch and display posts based on the selected category
+// const fetchPosts = (category = "") => {
+//     try {
+//         const postListElement = document.getElementById("post_data");
+//         postListElement.innerHTML = ''; // Clear previous posts
 
-    if (auth.currentUser) {
-        try {
-            // Get a reference to the specific post document in Firestore
-            const postRef = doc(db, "Post", postId);
-            await updateDoc(postRef, {
-                title,
-                desc,
-                time: serverTimestamp(), // Optionally update the timestamp
-            });
+//         // If a category is passed, filter posts by that category
+//         let queryRef = query(collection(db, "Post"), orderBy("time", "desc"));
 
-            alert("Post updated successfully");
+//         if (category) {
+//             // Only show posts that match the selected category
+//             queryRef = query(queryRef, where("category", "==", categoryInput.toLowerCase()));
+//         }
 
-            // After updating in Firestore, update the UI immediately
-            const titleElement = cardElement.querySelector('.title');
-            const descElement = cardElement.querySelector('.description');
+//         const unsubscribe = onSnapshot(queryRef, (querySnapshot) => {
+//             if (querySnapshot.empty) {
+//                 postListElement.innerHTML = '<p>No posts found for this category</p>';
+//             } else {
+//                 querySnapshot.forEach((doc) => {
+//                     const data = doc.data();
+//                     const timeString = data.time ? data.time.toDate().toLocaleString() : "No Timestamp";
+//                     const currentUser = auth.currentUser;
+//                     const userName = currentUser && currentUser.displayName;
 
-            if (titleElement && descElement) {
-                titleElement.innerText = title; // Update title in UI
-                descElement.innerText = desc; // Update description in UI
-            }
-        } catch (error) {
-            console.error("Error updating document:", error);
-            alert("Error updating the post");
-        }
-    } else {
-        alert("You must be signed in to update a post.");
+//                     // Create post element
+//                     const postElement = document.createElement('div');
+//                     postElement.classList.add('p-2', 'mb-2');
+//                     postElement.setAttribute('data-id', doc.id);
+
+//                     postElement.innerHTML = `
+//                         <div class="card-header d-flex">
+//                             <div class="name-time d-flex flex-column">
+//                                 ${userName}
+//                                 <div class="time">${timeString}</div>
+//                             </div>
+//                         </div>
+//                         <blockquote class="blockquote mb-0">
+//                             <p class="title">${data.title}</p>
+//                             <footer class="blockquote-footer description">${data.desc}</footer>
+//                         </blockquote>
+//                         <div class="card-footer d-flex justify-content-end">
+//                             <button type="button" class="ms-2 btn bg-primary text-light editBtn">Edit</button>
+//                             <button type="button" class="ms-2 btn btn-danger deleteBtn">Delete</button>
+//                         </div>
+//                     `;
+
+//                     postListElement.appendChild(postElement);
+//                 });
+
+//                 attachEventListeners(); // Attach event listeners for Edit/Delete actions
+//             }
+//         });
+
+//         return unsubscribe;
+//     } catch (error) {
+//         console.error("Error fetching posts:", error);
+//     }
+// };
+
+// // Handle category search button click
+// const handleSearchClick = () => {
+//     const searchBtn = document.getElementById("searchBtn");
+//     const searchCategoryInput = document.getElementById("searchCategory");
+
+//     searchBtn.addEventListener("click", () => {
+//         const selectedCategory = searchCategoryInput.value.trim().toLowerCase();
+
+//         // If the search input is empty, show all posts
+//         if (selectedCategory) {
+//             fetchPosts(selectedCategory);  // Fetch posts based on the selected category
+//         } else {
+//             document.getElementById("post_data").innerHTML = '<p>Please enter a category to search.</p>';
+//         }
+//     });
+// };
+
+// // Initial fetch to display all posts when the page loads
+// fetchPosts();
+
+// // Initialize search button listener
+// handleSearchClick();
+
+
+// let addDocument = async () => {
+//     try {
+//         let title_input = document.getElementById("title");
+//         let desc_input = document.getElementById("description");
+//         let category_input = document.getElementById("category");
+
+//         const selectedCategory = category_input.value;  // Get selected category for post
+
+//         const docRef = await addDoc(collection(db, "Post"), {
+//             title: title_input.value,
+//             desc: desc_input.value,
+//             category: selectedCategory,  // Store the category with the post
+//             time: Timestamp.now(),
+//         });
+
+//         console.log("Successfully added document with ID: ", docRef.id);
+
+//         title_input.value = '';
+//         desc_input.value = '';
+//         category_input.value = '';  // Reset category dropdown
+//     } catch (error) {
+//         console.log("Error adding document: ", error);
+//     }
+// };
+
+// const postButton = document.getElementById("button");
+// postButton.addEventListener("click", addDocument);
+
+// // Log out function
+// const logoutButton = document.getElementById("LogOut");
+// logoutButton.addEventListener("click", () => {
+//     auth.signOut().then(() => {
+//         alert("Logged out successfully");
+//     }).catch((error) => {
+//         alert("Error logging out: " + error.message);
+//     });
+// });
+
+
+let addPost = async () => {
+    let title = document.getElementById("title").value.trim();
+    let description = document.getElementById("description").value.trim();
+    let category = document.getElementById("category").value.trim().toLowerCase();
+
+    if (!title || !description || !category) {
+        alert("Please fill out all fields.");
+        return;
+    }
+
+    try {
+        const docRef = await addDoc(collection(db, "Post"), {
+            title: title,
+            description: description,
+            ServerTimestamp: serverTimestamp(),
+            category: category
+        });
+        console.log("Document written with ID:", docRef.id);
+        alert("Post added successfully!");
+        getAllPost(); // Refresh posts after adding
+    } catch (error) {
+        console.error("Error adding post:", error);
+        alert("Failed to add post. Please try again.");
     }
 };
 
-
-// Initialize post function
-
+document.getElementById("button").addEventListener('click', addPost);
 
 
+
+let getAllPost = async () => {
+    const q = query(collection(db, "Post"), orderBy('ServerTimestamp', 'desc'));
+    let postListElement = document.getElementById("post_data");
+
+    if (!postListElement) {
+        console.error("post_data element not found in the DOM.");
+        return;
+    }
+
+    postListElement.innerHTML = `<p>Loading posts...</p>`; // Show loading indicator
+
+    try {
+        const querySnapshot = await getDocs(q);
+        postListElement.innerHTML = ""; // Clear previous results
+
+        if (querySnapshot.empty) {
+            postListElement.innerHTML = `<p>No posts found.</p>`;
+            return;
+        }
+
+        querySnapshot.forEach((doc) => {
+            const postData = doc.data();
+            const timeString = postData.ServerTimestamp?.toDate().toLocaleString() || "No Timestamp";
+
+            postListElement.innerHTML += `
+                <div class="post-card">
+                    <div class="card-header">
+                        <p>Posted on: ${timeString}</p>
+                    </div>
+                    <h3>${postData.title}</h3>
+                    <p>${postData.description}</p>
+                    <small class="badge">${postData.category}</small>
+                </div>`;
+        });
+    } catch (error) {
+        console.error("Error fetching posts:", error);
+        alert("Failed to fetch posts. Please try again.");
+    }
+};
+
+// Load all posts on page load
+getAllPost();
+const searchByCategory = async () => {
+    const categoryInput = document.getElementById("searchCategory").value.trim().toLowerCase();
+    const postListElement = document.getElementById("post_data");
+
+    if (!categoryInput) {
+        alert("Please enter a category to search.");
+        return;
+    }
+
+    postListElement.innerHTML = `<p>Loading...</p>`; // Show loading indicator
+
+    try {
+        const q = query(collection(db, "Post"), where("category", "==", categoryInput));
+        const querySnapshot = await getDocs(q);
+
+        postListElement.innerHTML = ""; // Clear previous results
+
+        if (querySnapshot.empty) {
+            postListElement.innerHTML = `<p>No posts found for category: ${categoryInput}</p>`;
+            return;
+        }
+
+        querySnapshot.forEach((doc) => {
+            const postData = doc.data();
+            const timeString = postData.ServerTimestamp?.toDate().toLocaleString() || "No Timestamp";
+
+            postListElement.innerHTML += `
+                <div class="post-card">
+                    <div class="card-header">
+                        <p>Posted on: ${timeString}</p>
+                    </div>
+                    <h3 class="card text-primary">${postData.title}</h3>
+                    <p class="card">${postData.description}</p>
+                    <small class="badge">${postData.category}</small>
+                </div>`;
+        });
+    } catch (error) {
+        console.error("Error fetching posts by category:", error);
+        alert("Failed to fetch posts. Please try again.");
+    }
+};
+
+document.getElementById("searchBtn").addEventListener("click", searchByCategory);

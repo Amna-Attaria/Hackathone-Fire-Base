@@ -124,25 +124,7 @@
     list-style: none;
 }
 
-/* forth box  */
 
-.outer-circle2 {
-    width: 230px;
-    height: 250px;
-    background-color: #1e6cff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.inner-circle2 {
-    width: 180px;
-    height: 180px;
-    margin-top: 70px;
-    margin-right: 33px;
-    background-color: #80aaff;
-    border-radius: 50%;
-}
 
 /* footer css  */
 .footer {
@@ -170,26 +152,4 @@
     .footer-heading {
         font-size: 20px;
     }
-}
-
-
-.outer-circle3 {
-    width: 500px;
-    height:300px;
-    background-color: #1e6cff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-top-left-radius: 100px;
-    border-bottom-left-radius: 100px;
-    margin-bottom: 40px;
-}
-
-.inner-circle3 {
-    width: 180px;
-    height: 180px;
-    margin-top: 70px;
-    margin-right: 33px;
-    background-color: #80aaff;
-    border-radius: 50%;
 }

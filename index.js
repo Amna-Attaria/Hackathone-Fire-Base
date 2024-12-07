@@ -9,21 +9,32 @@ auth,
 
 
 let addPost = async () => {
+    // Check if user is signed in
+    const user = auth.currentUser; // 'auth' is your Firebase auth instance
+    if (!user) {
+        alert("Please sign in to add a post.");
+        return;
+    }
+
+    // Fetch input values
     let title = document.getElementById("title").value.trim();
     let description = document.getElementById("description").value.trim();
     let category = document.getElementById("category").value.trim().toLowerCase();
 
+    // Validate inputs
     if (!title || !description || !category) {
         alert("Please fill out all fields.");
         return;
     }
 
     try {
+        // Add the post to Firestore
         const docRef = await addDoc(collection(db, "Post"), {
             title: title,
             description: description,
-            ServerTimestamp: serverTimestamp(),
-            category: category
+            category: category,
+            userId: user.uid, // Store the user ID to associate the post with the user
+            ServerTimestamp: serverTimestamp()
         });
         console.log("Document written with ID:", docRef.id);
         alert("Post added successfully!");
@@ -33,8 +44,10 @@ let addPost = async () => {
         alert("Failed to add post. Please try again.");
     }
 };
-if (auth.currentUser) {
-document.getElementById("button").addEventListener('click', addPost);}
+
+// Attach event listener
+document.getElementById("button").addEventListener('click', addPost);
+
 
 
 let getAllPost = async () => {

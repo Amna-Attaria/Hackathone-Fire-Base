@@ -7,8 +7,9 @@ import {
     signInWithPopup, 
     GoogleAuthProvider,
     db,  
-    collection,getDocs , doc, setDoc,serverTimestamp,
+    collection,getDocs , doc, setDoc,serverTimestamp
 } from "./firebase.js";
+
 
 // Initialize Google Auth Provider
 const provider = new GoogleAuthProvider();
@@ -113,41 +114,26 @@ let getData = async()=>
     }
     getData()
 
-// Google Sign-In function
-const googleSignin = async () => {
-    try {
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-
-        // Check if user data exists in Firestore
-        const userDoc = doc(db, "userdata", user.uid);
-        const userSnapshot = await getDoc(userDoc);
-
-        if (!userSnapshot.exists()) {
-            // Add new user to Firestore
-            await setDoc(userDoc, {
-                name: user.displayName,
-                email: user.email,
-                uid: user.uid,
-                timestamp: serverTimestamp(),
-            });
-        }
-        alert("User signed in successfully");
-        window.location.href = "main.html";
-    } catch (error) {
-        console.error("Google Sign-In Error:", error.message);
-        alert("Error: " + error.message);
-    }
+// Start here    ------------------------------ 
+const googleSignin = () => {
+    signInWithPopup(auth, provider)
+        .then((result) => {
+            const user = result.user;
+            alert("User signed in successfully");
+            window.location.href = "index.html"; // Redirect to your main page
+        })
+        .catch((error) => {
+            const errorMessage = error.message;
+            console.error("Error during Google sign-in:", error);
+            alert(`You are not Registered ${errorMessage}`);
+        });
 };
+
 // Add event listener for Google Sign-In button
-document.addEventListener("DOMContentLoaded", () => {
-    const googleBtn = document.getElementById("google");
-    if (googleBtn) {
-        googleBtn.addEventListener("click", googleSignin);
-    } else {
-        console.error("Google Sign-In button not found in the DOM.");
-    }
-});
+const googleBtn = document.getElementById("google");
+if (googleBtn) {
+    googleBtn.addEventListener("click", googleSignin);
+}
 
 
 // Sign Out function

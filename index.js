@@ -126,10 +126,12 @@ const searchByCategory = async () => {
                     <div class="card-header">
                         <p>Posted on: ${timeString}</p>
                     </div>
-                    <h3 class="card text-primary">${postData.title}</h3>
+                    <h3 class="card ">${postData.title}</h3>
                     <p class="card">${postData.description}</p>
                     <small class="badge">${postData.category}</small>
-                </div>`;
+                </div>
+                <br />
+                `;
         });
     } catch (error) {
         console.error("Error fetching posts by category:", error);

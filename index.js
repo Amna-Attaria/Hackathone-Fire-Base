@@ -122,12 +122,12 @@ const searchByCategory = async () => {
             const timeString = postData.ServerTimestamp?.toDate().toLocaleString() || "No Timestamp";
 
             postListElement.innerHTML += `
-                <div class="post-card">
-                    <div class="card-header">
+                <div class="post">
+                    <div class="">
                         <p>Posted on: ${timeString}</p>
                     </div>
-                    <h3 class="card ">${postData.title}</h3>
-                    <p class="card">${postData.description}</p>
+                    <h3 class=" ">${postData.title}</h3>
+                    <p class="">${postData.description}</p>
                     <small class="badge">${postData.category}</small>
                 </div>
                 <br />

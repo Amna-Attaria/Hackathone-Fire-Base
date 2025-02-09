@@ -119,7 +119,7 @@ const googleSignin = () => {
     signInWithPopup(auth, provider)
         .then((result) => {
             const user = result.user;
-            alert("User signed in successfully");
+            alert(user ,"User signed in successfully");
             window.location.href = "index.html"; // Redirect to your main page
         })
         .catch((error) => {

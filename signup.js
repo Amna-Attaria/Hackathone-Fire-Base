@@ -119,13 +119,12 @@ const googleSignin = () => {
     signInWithPopup(auth, provider)
         .then((result) => {
             const user = result.user;
-            alert(user ,"User signed in successfully");
-            window.location.href = "index.html"; // Redirect to your main page
+            alert(user, "User signed in successfully");
+            window.location.href = "index.html"; // Redirect after login
         })
         .catch((error) => {
-            const errorMessage = error.message;
             console.error("Error during Google sign-in:", error);
-            alert(`You are not Registered ${errorMessage}`);
+            alert(`You are not Registered: ${error.message}`);
         });
 };
 
@@ -134,6 +133,7 @@ const googleBtn = document.getElementById("google");
 if (googleBtn) {
     googleBtn.addEventListener("click", googleSignin);
 }
+
 
 
 // Sign Out function
